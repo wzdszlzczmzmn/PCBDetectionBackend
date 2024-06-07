@@ -15,8 +15,9 @@ Including another URLconf
 """
 from rest_framework import routers
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 
+import UserAdmin.views
 import demo.views
 
 router = routers.DefaultRouter()
@@ -27,4 +28,10 @@ urlpatterns = [
     path("test/", demo.views.test),
     path("testPicture/", demo.views.picture_test),
     path("getPicture/", demo.views.picture_get_test),
+
+
+    # UserAdmin中的url
+    path("login/", UserAdmin.views.login),
+    path("register/", UserAdmin.views.register),
+
 ]
