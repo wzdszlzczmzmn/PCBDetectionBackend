@@ -16,6 +16,7 @@ Including another URLconf
 from rest_framework import routers
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 import UserAdmin.views
 import data.views
@@ -25,19 +26,9 @@ import product.views
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-
-    path("test/", demo.views.test),
-    path("testPicture/", demo.views.picture_test),
-    path("getPicture/", demo.views.picture_get_test),
-
-
-    # UserAdmin中的url
-    path("login/", UserAdmin.views.login),
-    path("register/", UserAdmin.views.register),
-
-    path("addtestdata/", product.views.addTestData),    # 加载数据
-    path("data/", include('data.urls')),
-
+    path('getProductStatus/', views.getProductStatus, name='getProductStatus'),
+    path('getProductLineList/', views.getProductLineList, name='getProductLineList'),
+    path('getDefectStatus/', views.getDefectStatus, name='getProductList'),
+    path('getYieldStatus/', views.getYieldStatus, name='getYieldStatus'),
 
 ]
