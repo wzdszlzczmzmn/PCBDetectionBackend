@@ -9,7 +9,7 @@ def addTestData(request):
     if request.method == 'GET':
         cnt = 0
         date_format = "%Y-%m-%d %H:%M:%S"
-        df = pd.read_csv('../cache/PCB.csv')
+        df = pd.read_csv('D:\\pythonProject\\PCBDetectionBackend\\cache\\PCB.csv')
         for index, row in df.iterrows():
             pcb = PCB(record_time=datetime.strptime(row['record_time'], date_format), line_no=row['line_no'],
                       picture_file_name=row['pic_file_name'], has_defect=row['has_defect'], mh=row['mh'],

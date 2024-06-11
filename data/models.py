@@ -1,11 +1,8 @@
 from django.db import models
 
-import pandas as pd
-
-from django.db import models, connection
-from django.contrib.postgres.fields import ArrayField
+from django.db import models
 from django.db.models import Sum, Count, IntegerField, Max
-from django.db.models.expressions import RawSQL, Case, When
+from django.db.models.expressions import Case, When
 from django.db.models.functions import TruncDate
 from django.db import transaction
 

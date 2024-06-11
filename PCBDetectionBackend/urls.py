@@ -31,13 +31,19 @@ urlpatterns = [
     path("testPicture/", demo.views.picture_test),
     path("getPicture/", demo.views.picture_get_test),
 
+    path("addtestdata/", product.views.addTestData),  # 加载数据
+    path("dataShow/", include('data.urls')),
 
     # UserAdmin中的url
     path("login/", UserAdmin.views.login),
     path("register/", UserAdmin.views.register),
+    path("userInfo/modifyUserInfo/", UserAdmin.views.modify_self_info),
+    path("userInfo/modifyUserPassword/", UserAdmin.views.modify_self_password),
+    path("userInfo/logout/", UserAdmin.views.logout),
 
-    path("addtestdata/", product.views.addTestData),    # 加载数据
-    path("data/", include('data.urls')),
-
-
+    path("userAdmin/getUserList/", UserAdmin.views.get_user_list),
+    path("userAdmin/getUserInfoUUID/", UserAdmin.views.get_user_info_uuid),
+    path("userAdmin/modifyInfoUUID/", UserAdmin.views.modify_info_uuid),
+    path("userAdmin/logoutUUID/", UserAdmin.views.logout_uuid),
+    path("userAdmin/addWorker/", UserAdmin.views.add_worker)
 ]

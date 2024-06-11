@@ -26,9 +26,9 @@ import product.views
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path('getProductStatus/', views.getProductStatus, name='getProductStatus'),
-    path('getProductLineList/', views.getProductLineList, name='getProductLineList'),
-    path('getDefectStatus/', views.getDefectStatus, name='getProductList'),
-    path('getYieldStatus/', views.getYieldStatus, name='getYieldStatus'),
+    path('getProductStatus/', views.get_product_status, name='getProductStatus'),
+    path('getProductLineList/', views.get_product_line_list, name='getProductLineList'),
+    path('getDefectStatus/', views.get_defect_status, name='getProductList'),
+    path('getYieldStatus/', views.get_yield_status, name='getYieldStatus'),
 
 ]
