@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     "django_filters",
     "django_crontab",
     "demo",
-    "UserAdmin"
+    "UserAdmin",
+    "product",
+    "data",
+    "task"
 ]
 
 MIDDLEWARE = [
@@ -136,3 +139,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 30
 }
+
+CRONJOBS = [
+    # 每1分钟执行一次crontab_test函数
+    ('*/1 * * * * ', 'data.views.update', '>>' + './cache/cron.log')
+]

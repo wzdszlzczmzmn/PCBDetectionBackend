@@ -26,5 +26,4 @@ def picture_test(request):
 @api_view(['GET'])
 def picture_get_test(request):
     file_path = './PCB-copy.png'
-
     return FileResponse(open(file_path, 'rb'))
