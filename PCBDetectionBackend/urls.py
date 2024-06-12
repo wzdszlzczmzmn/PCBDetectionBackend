@@ -21,6 +21,7 @@ import UserAdmin.views
 import data.views
 import demo.views
 import product.views
+import task.views
 
 router = routers.DefaultRouter()
 
@@ -45,5 +46,15 @@ urlpatterns = [
     path("userAdmin/getUserInfoUUID/", UserAdmin.views.get_user_info_uuid),
     path("userAdmin/modifyInfoUUID/", UserAdmin.views.modify_info_uuid),
     path("userAdmin/logoutUUID/", UserAdmin.views.logout_uuid),
-    path("userAdmin/addWorker/", UserAdmin.views.add_worker)
+    path("userAdmin/addWorker/", UserAdmin.views.add_worker),
+    path("userAdmin/getWorkerList/", UserAdmin.views.get_worker_list),
+
+    # task中的url
+    path("task/getTaskList/", task.views.get_task_list),
+    path("task/getTaskDetail/", task.views.get_task_detail),
+    path("task/getTaskPicture/", task.views.get_pcb_picture),
+    path("task/assignTask/", task.views.assign_task),
+    path("task/cancelAssign/", task.views.cancel_assign),
+    # path("task/importData", task.views.import_data)
+
 ]

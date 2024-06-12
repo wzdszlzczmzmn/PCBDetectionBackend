@@ -14,5 +14,25 @@ class User(models.Model):
     role = models.CharField(max_length=10, default='worker')  # 身份
     full_name = models.CharField(max_length=30, default='')  # 姓名
     email = models.EmailField(unique=True)  # 用户邮箱
-    deviceUUID = models.UUIDField(editable=True, null=True)
+    empno = models.CharField(max_length=10, unique=True, editable=False, default='')  # 工号
+
+    def save(self, *args, **kwargs):
+        if self.role == 'worker':
+            self.empno = self.generate_empno_worker()
+        else:
+            self.empno = self.generate_empno_admin()
+
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def generate_empno_worker():
+        worker_num = User.objects.filter(role='worker').count()
+
+        return f'W{worker_num + 1:04d}'
+
+    @staticmethod
+    def generate_empno_admin():
+        admin_num = User.objects.filter(role='admin').count()
+
+        return f'A{admin_num + 1:04d}'
 

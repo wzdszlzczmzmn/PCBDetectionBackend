@@ -1,7 +1,7 @@
 import traceback
 
 from django.contrib.auth.hashers import make_password, check_password
-from django.db import Error
+from django.db import Error, DatabaseError
 from django.core.exceptions import ObjectDoesNotExist
 
 from rest_framework.decorators import api_view
@@ -235,3 +235,18 @@ def add_worker(request):
         return Response({'errorInfo': '添加失败'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return Response({'info': '添加成功'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_worker_list(request):
+    res = []
+
+    try:
+        query_set = User.objects.filter(role='worker')
+
+        for item in query_set:
+            res.append({'UUID': item.UUID, 'fullName': item.full_name, 'empno': item.empno})
+    except DatabaseError:
+        return Response({'errorInfo': '服务器内部错误'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response(res, status=status.HTTP_200_OK)

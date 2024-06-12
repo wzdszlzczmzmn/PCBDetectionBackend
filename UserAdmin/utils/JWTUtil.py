@@ -6,7 +6,6 @@ from PCBDetectionBackend.settings import SECRET_KEY
 def generate_access_jwt(user):
     payload = {
         'id': str(user.UUID),
-        'deviceUUID': user.deviceUUID,
         'role': user.role,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1),
     }
@@ -18,7 +17,6 @@ def generate_access_jwt(user):
 def generate_refresh_jwt(user):
     payload = {
         'id': str(user.UUID),
-        'deviceUUID': user.deviceUUID,
         'role': user.role,
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
     }

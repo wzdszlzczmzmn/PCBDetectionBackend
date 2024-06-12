@@ -1,0 +1,1 @@
+PCB_IMAGE_FILE_PATH_PREFIX = 'E:\\PCBData\\'
