@@ -55,6 +55,8 @@ urlpatterns = [
     path("task/getTaskPicture/", task.views.get_pcb_picture),
     path("task/assignTask/", task.views.assign_task),
     path("task/cancelAssign/", task.views.cancel_assign),
+    path("task/getMyTasks/", task.views.get_my_tasks),
+    path("task/uploadTaskPicture/", task.views.upload_task_picture),
     # path("task/importData", task.views.import_data)
 
 ]

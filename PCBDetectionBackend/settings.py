@@ -86,7 +86,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "PCBDetection",
         'USER': 'postgres',
-        'PASSWORD': '',
+        'PASSWORD': 'w13655050226',
         'HOST': 'localhost',
         'PORT': '5432',
     }

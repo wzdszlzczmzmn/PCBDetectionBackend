@@ -25,7 +25,8 @@ def login(request):
         is_valid = check_password(password, user.password)
         if is_valid:
             token = generate_access_jwt(user)
-            response_dict = {'token': token, 'username': user.username, 'fullName': user.full_name, 'email': user.email}
+            response_dict = {'token': token, 'username': user.username, 'fullName': user.full_name, 'email': user.email,
+                             'role': user.role, 'empno': user.empno}
 
             return Response(response_dict)
 
