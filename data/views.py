@@ -12,6 +12,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from UserAdmin.utils.JWTUtil import decode_jwt
+
 
 def update():
     models.DataTable.update()
@@ -20,6 +22,19 @@ def update():
 # Create your views here.
 @api_view(['GET'])
 def get_product_status(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     # 返回残次品和良品数量
     start_date = request.query_params.get('startTime')
     end_date = request.query_params.get('endTime')
@@ -59,6 +74,19 @@ def get_product_status(request):
 
 @api_view(['GET'])
 def get_product_line_list(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     start_time_str = request.query_params.get('startTime')
     end_time_str = request.query_params.get('endTime')
 
@@ -76,6 +104,19 @@ def get_product_line_list(request):
 
 @api_view(['GET'])
 def get_defect_status(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     start_time = request.query_params.get('startTime')
     end_time = request.query_params.get('endTime')
     product_line_id = request.query_params.get('productLineId')
@@ -144,6 +185,19 @@ def get_defect_status(request):
 
 @api_view(['GET'])
 def get_yield_status(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     start_date = request.query_params.get('startTime')
     end_date = request.query_params.get('endTime')
     line_no = request.query_params.get('productLineId')

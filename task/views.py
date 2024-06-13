@@ -16,6 +16,7 @@ from UserAdmin.models import User
 import pandas
 from datetime import datetime
 
+from UserAdmin.utils.JWTUtil import decode_jwt
 
 @api_view(['GET'])
 def import_data(request):
@@ -37,6 +38,19 @@ def import_data(request):
 
 @api_view(['GET'])
 def get_task_list(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     start_time = request.query_params.get('startTime')
     end_time = request.query_params.get('endTime')
     finish_status = request.query_params.get('finishStatus')
@@ -75,6 +89,16 @@ def get_task_list(request):
 
 @api_view(['GET'])
 def get_task_detail(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     task_id = request.query_params.get('id')
 
     if not task_id:
@@ -97,6 +121,16 @@ def get_task_detail(request):
 
 @api_view(['GET'])
 def get_pcb_picture(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     task_id = request.query_params.get('id')
 
     if not task_id:
@@ -115,6 +149,19 @@ def get_pcb_picture(request):
 
 @api_view(['POST'])
 def assign_task(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     uuid = request.data.get('UUID')
     task_id = request.data.get('taskId')
 
@@ -137,6 +184,19 @@ def assign_task(request):
 
 @api_view(['POST'])
 def cancel_assign(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     task_id = request.data.get('taskId')
 
     if not task_id:
@@ -157,9 +217,20 @@ def cancel_assign(request):
 
 @api_view(['GET'])
 def get_my_tasks(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    uuid = payload['id']
+
     start_time = request.query_params.get('startTime')
     end_time = request.query_params.get('endTime')
-    uuid = request.query_params.get('UUID')
     finish_status = request.query_params.get('finishStatus')
     time_order = request.query_params.get('timeOrder')
 
@@ -194,6 +265,16 @@ def get_my_tasks(request):
 
 @api_view(['POST'])
 def upload_task_picture(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     task_id = request.data.get('taskId')
     upload_file = request.FILES['file']
 

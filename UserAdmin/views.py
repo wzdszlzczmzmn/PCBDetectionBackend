@@ -10,7 +10,7 @@ from rest_framework import status
 
 from UserAdmin.models import User
 
-from UserAdmin.utils.JWTUtil import generate_access_jwt
+from UserAdmin.utils.JWTUtil import generate_access_jwt, decode_jwt
 
 
 @api_view(['POST'])
@@ -61,70 +61,115 @@ def register(request):
 
 @api_view(['POST'])
 def modify_self_info(request):
-    user_name = request.data.get('username')
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    uuid = payload['id']
+
     new_full_name = request.data.get('fullName')
     new_email = request.data.get('email')
 
-    if user_name is None or new_full_name is None or new_email is None:
+    if new_full_name is None or new_email is None:
         return Response({"errorInfo": "修改信息有误"})
 
-    if User.objects.filter(username=user_name).exists():
-        user = User.objects.get(username=user_name)
+    try:
+        user = User.objects.get(UUID=uuid)
         user.full_name = new_full_name
         if new_email != user.email:
             if User.objects.filter(email=new_email).exists():
                 return Response({"errorInfo": "邮箱已被占用"})
             else:
                 user.email = new_email
-        user.save()
 
-        return Response({"newFullName": new_full_name, "newEmail": new_email})
-    else:
-        return Response({"errorInfo": "用户不存在"})
+        user.save()
+    except DatabaseError:
+        return Response({'errorInfo': '服务器内部错误'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return Response({"newFullName": new_full_name, "newEmail": new_email})
 
 
 @api_view(['POST'])
 def modify_self_password(request):
-    user_name = request.data.get('username')
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    uuid = payload['id']
+
     original_password = request.data.get('originalPassword')
     new_password = request.data.get('newPassword')
 
-    if user_name is None or original_password is None or new_password is None:
+    if original_password is None or new_password is None:
         return Response({"errorInfo": "修改密码有误"})
 
-    if User.objects.filter(username=user_name).exists():
-        user = User.objects.get(username=user_name)
+    try:
+        user = User.objects.get(UUID=uuid)
         password = user.password
         is_auth = check_password(original_password, password)
         if is_auth:
             new_password_encrypted = make_password(new_password)
             user.password = new_password_encrypted
             user.save()
-
-            return Response({"info": "修改成功"})
         else:
-            return Response({"errorInfo": "原密码错误"})
+            return Response({'errorInfo': '原密码错误'}, status=status.HTTP_400_BAD_REQUEST)
+    except DatabaseError:
+        return Response({'errorInfo': '服务器内部错误'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    else:
-        return Response({"errorInfo": "用户不存在"})
+    return Response({'errorInfo': '修改成功'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def logout(request):
-    username = request.data.get('username')
+    auth_header = request.headers.get('Authorization')
 
-    if User.objects.filter(username=username).exists():
-        user = User.objects.get(username=username)
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    uuid = payload['id']
+
+    try:
+        user = User.objects.get(UUID=uuid)
         user.is_deleted = True
         user.save()
+    except DatabaseError:
+        return Response({'errorInfo': '服务器内部错误'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response({"info": "注销成功"})
-    else:
-        return Response({"errorInfo": "用户不存在"})
+    return Response({'info': '注销成功'}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def get_user_list(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     user_type = request.query_params.get('userType')
     user_status = request.query_params.get('userStatus')
 
@@ -147,6 +192,20 @@ def get_user_list(request):
 
 @api_view(['GET'])
 def get_user_info_uuid(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
     uuid = request.query_params.get('UUID')
 
     if uuid != '':
@@ -159,6 +218,19 @@ def get_user_info_uuid(request):
 
 @api_view(['POST'])
 def modify_info_uuid(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     uuid = request.data.get('UUID')
     new_full_name = request.data.get('fullName')
     new_email = request.data.get('email')
@@ -195,6 +267,19 @@ def modify_info_uuid(request):
 
 @api_view(['POST'])
 def logout_uuid(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     uuid = request.data.get('UUID')
 
     if not uuid:
@@ -217,6 +302,19 @@ def logout_uuid(request):
 
 @api_view(['POST'])
 def add_worker(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     username = request.data.get('username')
     full_name = request.data.get('fullName')
     email = request.data.get('email')
@@ -240,10 +338,23 @@ def add_worker(request):
 
 @api_view(['GET'])
 def get_worker_list(request):
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    payload = decode_jwt(auth_header)
+
+    if not payload:
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    if payload['role'] != 'admin':
+        return Response({'errorInfo': '认证失败'}, status=status.HTTP_401_UNAUTHORIZED)
+
     res = []
 
     try:
-        query_set = User.objects.filter(role='worker')
+        query_set = User.objects.filter(role='worker', is_deleted=False)
 
         for item in query_set:
             res.append({'UUID': item.UUID, 'fullName': item.full_name, 'empno': item.empno})
